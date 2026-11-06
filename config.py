@@ -1,6 +1,7 @@
 """All CommitCraft settings. Secrets stay in .env and are read with os.environ."""
 
 import os
+import re
 from pathlib import Path
 
 from dotenv import load_dotenv
@@ -22,12 +23,15 @@ MERGED_DIR = EXPORT_DIR / "merged"
 BASE_MODEL = "Qwen/Qwen2.5-Coder-1.5B-Instruct"
 CLAUDE_MODEL = "claude-haiku-5-5"
 SOURCE_DATASET = "Maxscha/commitbench"
-HF_USERNAME = os.environ.get("HF_USERNAME", "")
+# The published repos are the default, so the demo and CLI work without any setup.
+HF_USERNAME = os.environ.get("HF_USERNAME") or "Shivankar04"
 DATASET_REPO = f"{HF_USERNAME}/commitcraft-data"
 ADAPTER_REPO = f"{HF_USERNAME}/commitcraft-qwen-1.5b-lora"
 GGUF_FILENAME = "commitcraft-q4_k_m.gguf"
 OLLAMA_MODEL = "commitcraft"
 OLLAMA_URL = "http://localhost:11434"
+SPACE_REPO = f"{HF_USERNAME}/commitcraft"
+GITHUB_URL = "https://github.com/shivankarpatra04/CommitCraft"
 
 # The one prompt template, used in data, training, eval and the app
 SYSTEM_PROMPT = "You write Conventional Commit messages."
@@ -36,6 +40,11 @@ ASSISTANT_FORMAT = "<type>(<scope>): <subject>"
 
 # Longest diff the model reads: about 960 tokens at 2.5 chars per token, so it fits MAX_SEQ_LENGTH
 MAX_PROMPT_DIFF_CHARS = 2400
+
+
+def normalize_diff(diff: str) -> str:
+    """Hide blob hashes, because the training data has <HASH> in every index line."""
+    return re.sub(r"^index [0-9a-f]+\.\.[0-9a-f]+", "index <HASH>..<HASH>", diff, flags=re.M)
 
 
 def build_messages(diff: str) -> list[dict]:
@@ -134,6 +143,7 @@ WANDB_PROJECT = "commitcraft"
 MAX_NEW_TOKENS = 40
 TEMPERATURE = 0.2
 OLLAMA_TIMEOUT_SECONDS = 120
+DEMO_CONTEXT_TOKENS = 2048
 EVAL_MAX_ROWS = 200
 EVAL_SEED = 42
 BEST_EXAMPLES = 5

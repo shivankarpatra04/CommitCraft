@@ -1,6 +1,5 @@
 """CommitCraft CLI: write a commit message for staged changes with a local Ollama model."""
 
-import re
 import subprocess
 from pathlib import Path
 
@@ -42,11 +41,6 @@ def run_git(*args: str) -> str:
     return result.stdout
 
 
-def normalize_diff(diff: str) -> str:
-    """Hide blob hashes, because the training data has <HASH> in every index line."""
-    return re.sub(r"^index [0-9a-f]+\.\.[0-9a-f]+", "index <HASH>..<HASH>", diff, flags=re.M)
-
-
 def staged_diff() -> str:
     """Read staged changes in the same diff format as the training data."""
     run_git("rev-parse", "--git-dir")  # Gives a clear error outside a repo.
@@ -55,7 +49,7 @@ def staged_diff() -> str:
     )
     if not diff.strip():
         raise fail("No staged changes. Stage files with `git add` first.")
-    return normalize_diff(diff)
+    return config.normalize_diff(diff)
 
 
 def ask_model(diff: str) -> str:
