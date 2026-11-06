@@ -10,8 +10,13 @@ dependencies = [
     "datasets>=5.1.0",
     "huggingface-hub>=2.4.0",
     "python-dotenv>=1.0",
+    "requests>=2.34.2",
     "rich>=13.7",
+    "typer>=0.27.3",
 ]
+
+[project.scripts]
+commitcraft = "app.cli:app"
 
 [project.optional-dependencies]
 train = [
@@ -47,3 +52,10 @@ dev = [
     "pytest>=9.2.0",
     "ruff>=0.17.4",
 ]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+only-include = ["app", "config.py"]

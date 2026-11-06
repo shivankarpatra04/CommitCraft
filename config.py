@@ -15,6 +15,8 @@ LABELED_PATH = OUTPUTS_DIR / "labeled.jsonl"
 ADAPTER_DIR = OUTPUTS_DIR / "adapter"
 PREDICTIONS_PATH = OUTPUTS_DIR / "eval_predictions.jsonl"
 RESULTS_PATH = OUTPUTS_DIR / "results.md"
+EXPORT_DIR = OUTPUTS_DIR / "export"
+MERGED_DIR = EXPORT_DIR / "merged"
 
 # Models and repos
 BASE_MODEL = "Qwen/Qwen2.5-Coder-1.5B-Instruct"
@@ -131,6 +133,7 @@ WANDB_PROJECT = "commitcraft"
 # Generation
 MAX_NEW_TOKENS = 40
 TEMPERATURE = 0.2
+OLLAMA_TIMEOUT_SECONDS = 120
 EVAL_MAX_ROWS = 200
 EVAL_SEED = 42
 BEST_EXAMPLES = 5

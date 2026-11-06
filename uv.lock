@@ -249,13 +249,15 @@ wheels = [
 [[package]]
 name = "commitcraft"
 version = "0.1.0"
-source = { virtual = "." }
+source = { editable = "." }
 dependencies = [
     { name = "anthropic" },
     { name = "datasets" },
     { name = "huggingface-hub" },
     { name = "python-dotenv" },
+    { name = "requests" },
     { name = "rich" },
+    { name = "typer" },
 ]
 
 [package.optional-dependencies]
@@ -289,11 +291,13 @@ requires-dist = [
     { name = "huggingface-hub", specifier = ">=2.4.0" },
     { name = "peft", marker = "extra == 'train'", specifier = ">=0.21.2" },
     { name = "python-dotenv", specifier = ">=1.0" },
+    { name = "requests", specifier = ">=2.34.2" },
     { name = "rich", specifier = ">=13.7" },
     { name = "rouge-score", marker = "extra == 'eval'", specifier = ">=0.1.2" },
     { name = "torch", marker = "extra == 'train'", specifier = ">=2.15.0" },
     { name = "transformers", marker = "extra == 'train'", specifier = ">=5.22.1" },
     { name = "trl", marker = "extra == 'train'", specifier = ">=1.17.1" },
+    { name = "typer", specifier = ">=0.27.3" },
     { name = "wandb", marker = "extra == 'train'", specifier = ">=0.31.0" },
 ]
 provides-extras = ["train", "eval"]

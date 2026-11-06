@@ -1,1 +1,18 @@
-# Ollama Modelfile. Built in Phase 6.
+# Download the GGUF next to this file, then run: ollama create commitcraft -f Modelfile
+FROM ./commitcraft-q4_k_m.gguf
+
+# The same Qwen chat format the model was trained on.
+TEMPLATE """<|im_start|>system
+{{ .System }}<|im_end|>
+<|im_start|>user
+{{ .Prompt }}<|im_end|>
+<|im_start|>assistant
+"""
+SYSTEM """You write Conventional Commit messages."""
+
+PARAMETER temperature 0.2
+PARAMETER num_predict 40
+# The evaluated model used no repetition penalty, so this matches it.
+PARAMETER repeat_penalty 1
+PARAMETER stop "<|im_end|>"
+PARAMETER stop "<|endoftext|>"
