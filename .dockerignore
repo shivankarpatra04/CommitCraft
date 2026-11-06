@@ -1,0 +1,7 @@
+.env
+.git
+.venv
+outputs
+wandb
+*.gguf
+*.safetensors

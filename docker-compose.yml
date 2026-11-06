@@ -1,1 +1,12 @@
-# Runs the Gradio demo. Built in Phase 8.
+# Run the demo with: docker compose up --build, then open http://localhost:7860
+services:
+  demo:
+    build: .
+    ports:
+      - "7860:7860"
+    volumes:
+      # Keep the 1 GB model between runs, so it downloads only once.
+      - model-cache:/root/.cache/huggingface
+
+volumes:
+  model-cache:
