@@ -1,0 +1,21 @@
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+.pytest_cache/
+.ruff_cache/
+*.egg-info/
+build/
+dist/
+
+# Secrets
+.env
+
+# Generated data and models
+outputs/
+wandb/
+*.gguf
+*.safetensors
+
+# Notebooks
+.ipynb_checkpoints/
