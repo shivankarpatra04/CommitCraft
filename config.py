@@ -32,6 +32,18 @@ SYSTEM_PROMPT = "You write Conventional Commit messages."
 USER_PROMPT = "Write a commit message for this diff:\n{diff}"
 ASSISTANT_FORMAT = "<type>(<scope>): <subject>"
 
+# Longest diff the model reads: about 960 tokens at 2.5 chars per token, so it fits MAX_SEQ_LENGTH
+MAX_PROMPT_DIFF_CHARS = 2400
+
+
+def build_messages(diff: str) -> list[dict]:
+    """Build the chat prompt for a diff. Training, eval and the app all call this."""
+    return [
+        {"role": "system", "content": SYSTEM_PROMPT},
+        {"role": "user", "content": USER_PROMPT.format(diff=diff[:MAX_PROMPT_DIFF_CHARS])},
+    ]
+
+
 # The one Conventional Commit check
 COMMIT_REGEX = (
     r"^(feat|fix|docs|style|refactor|perf|test|build|ci|chore)"
@@ -112,6 +124,9 @@ MAX_SEQ_LENGTH = 1024
 BATCH_SIZE = 4
 GRAD_ACCUM_STEPS = 4
 EVAL_STEPS = 100
+LOGGING_STEPS = 10
+CHECKPOINTS_DIR = OUTPUTS_DIR / "checkpoints"
+WANDB_PROJECT = "commitcraft"
 
 # Generation
 MAX_NEW_TOKENS = 40

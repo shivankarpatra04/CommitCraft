@@ -13,6 +13,17 @@ dependencies = [
     "rich>=13.7",
 ]
 
+[project.optional-dependencies]
+train = [
+    "accelerate>=1.15.0",
+    "bitsandbytes>=0.50.2",
+    "peft>=0.21.2",
+    "torch>=2.15.0",
+    "transformers>=5.22.1",
+    "trl>=1.17.1",
+    "wandb>=0.31.0",
+]
+
 [tool.ruff]
 line-length = 100
 target-version = "py311"
