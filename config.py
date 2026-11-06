@@ -46,6 +46,28 @@ MIN_MESSAGE_CHARS = 10
 MAX_MESSAGE_CHARS = 100
 MAX_ROWS_PER_LANGUAGE = 4000
 MAX_KEPT_ROWS = 20000
+LOW_VALUE_WORDS = {
+    "fix", "fixes", "fixed", "update", "updates", "updated", "wip", "change", "changes",
+    "changed", "minor", "small", "misc", "stuff", "bug", "bugs", "bugfix", "bugfixes",
+    "some", "more", "code", "commit", "tweak", "tweaks", "cleanup", "and",
+}
+MERGE_REGEX = r"^merged?\b"
+VERSION_BUMP_REGEX = (
+    r"^v?\d+(\.\d+)+\S*$|\b(bump|release|version)\b.*\d+\.\d+|^bump(ed)? version|^version bump"
+)
+BARE_ISSUE_REGEX = (
+    r"^((fix(es|ed)?|close[sd]?|resolve[sd]?|issue|refs?|see)\s*:?\s*)?#?(\w+-)?[\d.]+\W*$"
+)
+SECRET_REGEXES = [
+    r"AKIA[0-9A-Z]{16}",
+    r"-----BEGIN [A-Z ]*PRIVATE KEY-----",
+    r"gh[pousr]_[A-Za-z0-9]{36}",
+    r"xox[abprs]-[A-Za-z0-9-]{10,}",
+    r"sk-[A-Za-z0-9]{20,}",
+    r"AIza[0-9A-Za-z_-]{35}",
+    r"(?i)(password|passwd|secret|api[_-]?key|access[_-]?token|auth[_-]?token)[\"']?\s*[:=]\s*"
+    r"[\"'][^\"'\s]{8,}[\"']",
+]
 
 # Relabeling and splits
 MIN_QUALITY = 4

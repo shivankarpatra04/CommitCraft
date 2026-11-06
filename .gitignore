@@ -19,3 +19,6 @@ wandb/
 
 # Notebooks
 .ipynb_checkpoints/
+
+# Editor
+.vscode/
