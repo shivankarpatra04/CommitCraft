@@ -6,7 +6,9 @@ readme = "README.md"
 license = "MIT"
 requires-python = ">=3.11,<3.12"
 dependencies = [
+    "anthropic>=2.6.0",
     "datasets>=5.1.0",
+    "huggingface-hub>=2.4.0",
     "python-dotenv>=1.0",
     "rich>=13.7",
 ]
