@@ -277,8 +277,6 @@ name = "commitcraft"
 version = "0.1.0"
 source = { editable = "." }
 dependencies = [
-    { name = "anthropic" },
-    { name = "datasets" },
     { name = "huggingface-hub" },
     { name = "python-dotenv" },
     { name = "requests" },
@@ -307,6 +305,8 @@ train = [
 
 [package.dev-dependencies]
 dev = [
+    { name = "anthropic" },
+    { name = "datasets" },
     { name = "pytest" },
     { name = "ruff" },
 ]
@@ -314,9 +314,7 @@ dev = [
 [package.metadata]
 requires-dist = [
     { name = "accelerate", marker = "extra == 'train'", specifier = ">=1.15.0" },
-    { name = "anthropic", specifier = ">=2.6.0" },
     { name = "bitsandbytes", marker = "extra == 'train'", specifier = ">=0.50.2" },
-    { name = "datasets", specifier = ">=5.1.0" },
     { name = "evaluate", marker = "extra == 'eval'", specifier = ">=0.4.6" },
     { name = "gradio", marker = "extra == 'demo'", specifier = "==6.31.0" },
     { name = "huggingface-hub", specifier = ">=2.4.0" },
@@ -336,6 +334,8 @@ provides-extras = ["train", "demo", "eval"]
 
 [package.metadata.requires-dev]
 dev = [
+    { name = "anthropic", specifier = ">=2.6.0" },
+    { name = "datasets", specifier = ">=5.1.0" },
     { name = "pytest", specifier = ">=9.2.0" },
     { name = "ruff", specifier = ">=0.17.4" },
 ]

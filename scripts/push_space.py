@@ -1,4 +1,4 @@
-"""Push the demo to a public Space and the model card to the model repo. Needs --push to upload."""
+"""Push the model card and optionally the demo Space. Nothing uploads without a flag."""
 
 import argparse
 import os
@@ -22,8 +22,21 @@ def space_files() -> dict[str, Path]:
     }
 
 
-def push() -> None:
-    """Upload both. The Space and the model card are public from this moment."""
+def push_card() -> None:
+    """Upload the model card, which is public from this moment."""
+    from huggingface_hub import HfApi
+
+    HfApi(token=os.environ["HF_TOKEN"]).upload_file(
+        path_or_fileobj=str(config.ROOT_DIR / "docs" / "MODEL_CARD.md"),
+        path_in_repo="README.md",
+        repo_id=config.ADAPTER_REPO,
+        commit_message="Add model card",
+    )
+    console.print(f"Model card: https://huggingface.co/{config.ADAPTER_REPO}")
+
+
+def push_space() -> None:
+    """Upload the demo. A Gradio Space on free CPU needs a Hugging Face PRO subscription."""
     from huggingface_hub import CommitOperationAdd, HfApi
 
     api = HfApi(token=os.environ["HF_TOKEN"])
@@ -35,21 +48,19 @@ def push() -> None:
     api.create_commit(
         config.SPACE_REPO, operations, commit_message="Update demo", repo_type="space"
     )
-    api.upload_file(
-        path_or_fileobj=str(config.ROOT_DIR / "docs" / "MODEL_CARD.md"),
-        path_in_repo="README.md",
-        repo_id=config.ADAPTER_REPO,
-        commit_message="Add model card",
-    )
     console.print(f"Space: https://huggingface.co/spaces/{config.SPACE_REPO}")
-    console.print(f"Model card: https://huggingface.co/{config.ADAPTER_REPO}")
 
 
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--push", action="store_true", help="Upload. Without this, only list files")
-    if parser.parse_args().push:
-        push()
+    parser.add_argument("--card", action="store_true", help="Upload the model card")
+    parser.add_argument("--space", action="store_true", help="Upload the demo Space")
+    args = parser.parse_args()
+    if args.card:
+        push_card()
+    if args.space:
+        push_space()
+    if args.card or args.space:
         return
     for name, path in space_files().items():
         console.print(f"{config.SPACE_REPO}/{name} <- {path.relative_to(config.ROOT_DIR)}")

@@ -30,6 +30,7 @@ ADAPTER_REPO = f"{HF_USERNAME}/commitcraft-qwen-1.5b-lora"
 GGUF_FILENAME = "commitcraft-q4_k_m.gguf"
 OLLAMA_MODEL = "commitcraft"
 OLLAMA_URL = "http://localhost:11434"
+MODEL_DOWNLOAD_DIR = Path.home() / ".commitcraft"
 SPACE_REPO = f"{HF_USERNAME}/commitcraft"
 GITHUB_URL = "https://github.com/shivankarpatra04/CommitCraft"
 

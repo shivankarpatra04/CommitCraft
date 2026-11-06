@@ -2,6 +2,7 @@
 
 import os
 import subprocess
+from collections.abc import Iterator
 from pathlib import Path
 from types import SimpleNamespace
 from unittest.mock import patch
@@ -189,6 +190,59 @@ def test_install_hook_keeps_a_foreign_hook(repo: Path) -> None:
     assert result.exit_code == 1
     assert "already exists" in result.stderr
     assert "mine" in hook.read_text()
+
+
+@pytest.fixture
+def setup_mocks(tmp_path: Path) -> Iterator[SimpleNamespace]:
+    """Fake Ollama and the download, and record what the Modelfile looked like."""
+    folder = tmp_path / "models"
+    seen = {}
+
+    def fake_download(repo: str, filename: str, local_dir: Path) -> None:
+        local_dir.mkdir()
+        (local_dir / filename).write_text("gguf")
+        seen["repo"] = repo
+
+    def fake_run(command: list[str]) -> SimpleNamespace:
+        seen["command"] = command
+        seen["modelfile"] = Path(command[-1]).read_text(encoding="utf-8")
+        seen["gguf"] = (Path(command[-1]).parent / config.GGUF_FILENAME).exists()
+        return SimpleNamespace(returncode=seen.get("returncode", 0))
+
+    with (
+        patch.object(config, "MODEL_DOWNLOAD_DIR", folder),
+        patch("huggingface_hub.hf_hub_download", fake_download),
+        patch.object(cli.subprocess, "run", fake_run),
+        patch.object(cli.shutil, "which", lambda name: "ollama"),
+    ):
+        yield SimpleNamespace(seen=seen, folder=folder)
+
+
+def test_setup_creates_the_model_and_removes_the_download(setup_mocks: SimpleNamespace) -> None:
+    result = runner.invoke(cli.app, ["setup"])
+    assert result.exit_code == 0
+    seen = setup_mocks.seen
+    assert seen["repo"] == config.ADAPTER_REPO
+    assert seen["command"][:3] == ["ollama", "create", config.OLLAMA_MODEL]
+    assert f"FROM ./{config.GGUF_FILENAME}" in seen["modelfile"]
+    assert seen["gguf"]
+    assert not setup_mocks.folder.exists()
+
+
+def test_setup_keeps_the_download_when_ollama_fails(setup_mocks: SimpleNamespace) -> None:
+    setup_mocks.seen["returncode"] = 1
+    result = runner.invoke(cli.app, ["setup"])
+    assert result.exit_code == 1
+    assert "failed" in result.stderr
+    assert setup_mocks.folder.exists()
+
+
+def test_setup_without_ollama_says_where_to_get_it(setup_mocks: SimpleNamespace) -> None:
+    with patch.object(cli.shutil, "which", lambda name: None):
+        result = runner.invoke(cli.app, ["setup"])
+    assert result.exit_code == 1
+    assert "ollama.com/download" in result.stderr
+    assert not setup_mocks.folder.exists()
 
 
 def test_modelfile_matches_the_training_prompt() -> None:

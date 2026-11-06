@@ -1,8 +1,7 @@
 """Demo logic and the Space bundle, with a fake model. No Gradio, network or GGUF needed."""
 
 import re
-from types import SimpleNamespace
-from unittest.mock import patch
+from unittest.mock import MagicMock, patch
 
 import config
 from app import space
@@ -75,21 +74,30 @@ def test_dry_run_uploads_nothing(capsys) -> None:
     assert "Nothing was uploaded" in capsys.readouterr().out
 
 
-def test_push_uploads_space_and_model_card(monkeypatch) -> None:
+def test_card_flag_uploads_only_the_card(monkeypatch) -> None:
     monkeypatch.setenv("HF_TOKEN", "test-value")
-    client = SimpleNamespace(
-        create_repo=lambda *args, **kwargs: None,
-        create_commit=lambda *args, **kwargs: None,
-        upload_file=lambda **kwargs: uploads.append(kwargs),
-    )
-    uploads: list[dict] = []
+    client = MagicMock()
     with (
-        patch("sys.argv", ["push_space", "--push"]),
+        patch("sys.argv", ["push_space", "--card"]),
         patch("huggingface_hub.HfApi", lambda token: client),
     ):
         push_space.main()
-    assert uploads[0]["repo_id"] == config.ADAPTER_REPO
-    assert uploads[0]["path_in_repo"] == "README.md"
+    client.create_repo.assert_not_called()
+    upload = client.upload_file.call_args.kwargs
+    assert upload["repo_id"] == config.ADAPTER_REPO
+    assert upload["path_in_repo"] == "README.md"
+
+
+def test_space_flag_creates_the_space(monkeypatch) -> None:
+    monkeypatch.setenv("HF_TOKEN", "test-value")
+    client = MagicMock()
+    with (
+        patch("sys.argv", ["push_space", "--space"]),
+        patch("huggingface_hub.HfApi", lambda token: client),
+    ):
+        push_space.main()
+    assert client.create_repo.call_args.kwargs["space_sdk"] == "gradio"
+    client.upload_file.assert_not_called()
 
 
 def test_model_card_covers_the_required_sections() -> None:
@@ -106,3 +114,4 @@ def test_model_card_covers_the_required_sections() -> None:
     for section in sections:
         assert f"\n## {section}\n" in text
     assert "CC BY-NC 4.0" in text
+    assert "huggingface.co/spaces" not in text

@@ -18,8 +18,7 @@ tags:
 This model turns a `git diff` into a one-line [Conventional Commit](https://www.conventionalcommits.org/)
 message. It runs offline with Ollama. This repo holds the LoRA adapter and a 986 MB Q4_K_M GGUF.
 
-- Code: https://github.com/shivankarpatra04/CommitCraft
-- Demo: https://huggingface.co/spaces/Shivankar04/commitcraft
+- Code and setup guide: https://github.com/shivankarpatra04/CommitCraft
 
 ## Intended use
 
@@ -29,12 +28,16 @@ It is not meant for unattended commits, large refactors or code review. Non-comm
 
 ## Use with Ollama
 
+With [Ollama](https://ollama.com/download) and [uv](https://docs.astral.sh/uv/) installed:
+
 ```bash
-hf download Shivankar04/commitcraft-qwen-1.5b-lora commitcraft-q4_k_m.gguf --local-dir .
-ollama create commitcraft -f Modelfile
+uv tool install git+https://github.com/shivankarpatra04/CommitCraft
+commitcraft setup
+git add .
+commitcraft commit
 ```
 
-The `Modelfile` and a CLI with a git hook are in the GitHub repo. The prompt must match training:
+To call the model yourself, the prompt must match training:
 
 - System: `You write Conventional Commit messages.`
 - User: `Write a commit message for this diff:` followed by a new line and the diff

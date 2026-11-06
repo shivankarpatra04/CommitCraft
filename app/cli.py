@@ -1,5 +1,6 @@
 """CommitCraft CLI: write a commit message for staged changes with a local Ollama model."""
 
+import shutil
 import subprocess
 from pathlib import Path
 
@@ -78,6 +79,35 @@ def ask_model(diff: str) -> str:
     if not lines:
         raise fail("The model returned an empty message.")
     return lines[0].strip()
+
+
+def modelfile_text() -> str:
+    """Read the Modelfile: packaged next to this file when installed, else at the repo root."""
+    packaged = Path(__file__).with_name("Modelfile")
+    path = packaged if packaged.exists() else config.ROOT_DIR / "Modelfile"
+    return path.read_text(encoding="utf-8")
+
+
+@app.command()
+def setup() -> None:
+    """Download the model and add it to Ollama. Run this once."""
+    from huggingface_hub import hf_hub_download
+
+    if shutil.which("ollama") is None:
+        raise fail("Ollama is not installed. Get it from https://ollama.com/download")
+    typer.echo("Downloading the model (about 1 GB). If this stops, run the command again.")
+    folder = config.MODEL_DOWNLOAD_DIR
+    hf_hub_download(config.ADAPTER_REPO, config.GGUF_FILENAME, local_dir=folder)
+    # The Modelfile finds the GGUF by a relative path, so this also works with spaces in the path.
+    modelfile = folder / "Modelfile"
+    modelfile.write_text(modelfile_text(), encoding="utf-8", newline="\n")
+    typer.echo("Adding it to Ollama.")
+    result = subprocess.run(["ollama", "create", config.OLLAMA_MODEL, "-f", str(modelfile)])
+    if result.returncode != 0:
+        raise fail("`ollama create` failed. Check that Ollama is running, then run this again.")
+    # Ollama now has its own copy, so this one only wastes 1 GB.
+    shutil.rmtree(folder)
+    typer.echo("Done. Stage a change with `git add`, then run `commitcraft commit`.")
 
 
 @app.command()
