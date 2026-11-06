@@ -49,6 +49,7 @@ def normalize_diff(diff: str) -> str:
 
 def staged_diff() -> str:
     """Read staged changes in the same diff format as the training data."""
+    run_git("rev-parse", "--git-dir")  # Gives a clear error outside a repo.
     diff = run_git(
         "diff", "--cached", "--no-color", "--no-ext-diff", "--src-prefix=a/", "--dst-prefix=b/"
     )

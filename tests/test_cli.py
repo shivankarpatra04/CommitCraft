@@ -103,6 +103,14 @@ def test_ollama_errors_are_clear(repo: Path, mock: dict, expected: str) -> None:
     assert expected in result.stderr
 
 
+def test_outside_a_repo(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.chdir(tmp_path)
+    monkeypatch.setenv("GIT_CEILING_DIRECTORIES", str(tmp_path.parent))
+    result = runner.invoke(cli.app, ["suggest"])
+    assert result.exit_code == 1
+    assert "not a git repository" in result.stderr
+
+
 def test_commit_accept(repo: Path) -> None:
     with patch.object(cli.requests, "post", return_value=fake_reply()):
         assert runner.invoke(cli.app, ["commit"], input="a\n").exit_code == 0
