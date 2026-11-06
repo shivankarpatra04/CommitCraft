@@ -57,6 +57,29 @@ def test_long_diff_is_cut_but_label_survives() -> None:
     assert text.endswith(row["message"] + "$")
 
 
+def test_only_trainable_weights_become_float32() -> None:
+    class FakeData:
+        def __init__(self, dtype: str) -> None:
+            self.dtype = dtype
+
+        def float(self) -> "FakeData":
+            return FakeData("float32")
+
+    class FakeParam:
+        def __init__(self, requires_grad: bool) -> None:
+            self.requires_grad = requires_grad
+            self.data = FakeData("bfloat16")
+
+    class FakeModel:
+        params = [FakeParam(True), FakeParam(False)]
+
+        def parameters(self) -> list[FakeParam]:
+            return self.params
+
+    train.use_float32_adapter(FakeModel())
+    assert [param.data.dtype for param in FakeModel.params] == ["float32", "bfloat16"]
+
+
 def test_parser_defaults_and_flags() -> None:
     defaults = train.build_parser().parse_args([])
     assert (defaults.epochs, defaults.max_steps, defaults.push) == (config.EPOCHS, -1, False)

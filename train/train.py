@@ -76,6 +76,13 @@ def load_quantized_model():
     return model
 
 
+def use_float32_adapter(model) -> None:
+    """Undo SFTTrainer's bf16 cast of LoRA weights, because the fp16 grad scaler cannot use bf16."""
+    for param in model.parameters():
+        if param.requires_grad:
+            param.data = param.data.float()
+
+
 def build_trainer(model, tokenizer, train_data, eval_data, args, report_to: str, use_fp16: bool):
     """Create the trainer. Kept apart from model loading so it can be tested without a GPU."""
     from transformers import DataCollatorForSeq2Seq
@@ -109,7 +116,7 @@ def build_trainer(model, tokenizer, train_data, eval_data, args, report_to: str,
     )
     # Pads each batch; label padding uses -100 so padding never counts toward the loss.
     collator = DataCollatorForSeq2Seq(tokenizer, label_pad_token_id=IGNORE_INDEX, padding=True)
-    return SFTTrainer(
+    trainer = SFTTrainer(
         model=model,
         args=training_args,
         train_dataset=train_data,
@@ -117,6 +124,8 @@ def build_trainer(model, tokenizer, train_data, eval_data, args, report_to: str,
         data_collator=collator,
         processing_class=tokenizer,
     )
+    use_float32_adapter(trainer.model)
+    return trainer
 
 
 def build_parser() -> argparse.ArgumentParser:
