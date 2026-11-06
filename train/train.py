@@ -39,10 +39,9 @@ def tokenize_split(split, tokenizer):
     return kept
 
 
-def load_quantized_model():
-    """Load the base model in 4-bit and make it ready for LoRA."""
+def load_base_model():
+    """Load the base model in 4-bit. Training and eval both start from this."""
     import torch
-    from peft import LoraConfig, get_peft_model, prepare_model_for_kbit_training
     from transformers import AutoModelForCausalLM, BitsAndBytesConfig
 
     quantization = BitsAndBytesConfig(
@@ -56,10 +55,16 @@ def load_quantized_model():
         bnb_4bit_compute_dtype=torch.float16,
     )
     # One GPU is plenty for a 4-bit 1.5B model, and it keeps the setup simple.
-    model = AutoModelForCausalLM.from_pretrained(
+    return AutoModelForCausalLM.from_pretrained(
         config.BASE_MODEL, quantization_config=quantization, device_map={"": 0}
     )
-    model = prepare_model_for_kbit_training(model)
+
+
+def load_quantized_model():
+    """Load the base model in 4-bit and make it ready for LoRA."""
+    from peft import LoraConfig, get_peft_model, prepare_model_for_kbit_training
+
+    model = prepare_model_for_kbit_training(load_base_model())
     lora = LoraConfig(
         # r is the size of the small adapter matrices: bigger learns more but uses more memory.
         r=config.LORA_R,

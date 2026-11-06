@@ -23,6 +23,10 @@ train = [
     "trl>=1.17.1",
     "wandb>=0.31.0",
 ]
+eval = [
+    "evaluate>=0.4.6",
+    "rouge-score>=0.1.2",
+]
 
 [tool.ruff]
 line-length = 100
