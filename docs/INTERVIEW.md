@@ -108,7 +108,6 @@ quantizing. 20 rows are too few to settle that, so I would rerun the 200-row eva
 Q1. Why is there no live demo link?
 A. When I pushed, Hugging Face returned HTTP 402, because Gradio Spaces on free CPU now need a paid plan.
 I chose not to pay for one, so there is no hosted demo. The project's main goal is offline use, so a local demo is enough.
-chose no hosted demo. The project's main goal is offline use, so a local demo and a GIF show it well.
 
 Q2. Why is the model licensed CC BY-NC 4.0 when the base model is Apache-2.0?
 A. The adapter was trained on CommitBench, which is CC BY-NC 4.0. Whether a trained model inherits a data
@@ -127,10 +126,10 @@ A. Split the logic from the expensive calls. Unit tests mock those calls and che
 handling on CPU in seconds, and hook tests use real git. Mocks cannot prove the real thing works, so I also ran
 one-off real checks: a tiny model for the trainer, and the real GGUF through Ollama. Real GPU runs still found bugs.
 
-Q2. What is in `.dockerignore`, and why does it matter?
-A. Docker sends the build folder to the daemon, and `COPY` could then put files into the image. Ignoring `.env` keeps
-secrets out of a shareable image. Ignoring `outputs`, `.git` and `*.gguf` keeps the build fast and the image small.
-The image downloads the model at the first request, and a compose volume keeps it between runs.
+Q2. What did you cut from the plan, and how did you decide?
+A. The plan had a Dockerfile and a demo GIF. I built and tested Docker in CI, but my PC cannot run Docker and
+no user path needs it, so I removed it, and also chose to skip the GIF. Less code means less to maintain. The
+web demo still runs with one uv command. I recorded each change from the plan.
 
 Q3. If you had one more week, what would you do?
 A. First, rerun the 200-row eval on the GGUF, because quantized quality was checked on only 20 rows. Then test on real

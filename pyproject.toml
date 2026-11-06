@@ -1,6 +1,6 @@
 [project]
 name = "commitcraft"
-version = "0.1.0"
+version = "1.0.0"
 description = "Fine-tuned Qwen2.5-Coder that turns a git diff into a Conventional Commit message, offline with Ollama."
 readme = "README.md"
 license = "MIT"

@@ -8,8 +8,6 @@ CommitCraft turns a `git diff` into a one-line [Conventional Commit](https://www
 message, using Qwen2.5-Coder 1.5B fine-tuned with QLoRA. It runs on your own computer with Ollama, so your code
 stays there.
 
-<!-- DEMO GIF -->
-
 ## The problem
 
 Good commit messages take effort, so they often end up as `fix stuff`. Hosted AI tools can write them, but they
@@ -39,8 +37,8 @@ New to the terminal? [docs/GUIDE.md](docs/GUIDE.md) covers each step and common 
 | `commitcraft commit` | Suggests a message, then commits it after you accept, edit or retry |
 | `commitcraft install-hook` | Fills the message on a plain `git commit`. Skips `-m`, merges and amends |
 
-To try the web demo locally, clone this repo and run `docker compose up --build`, or
-`uv run --extra demo python -m app.space`. Then open http://localhost:7860.
+To try the web demo locally, clone this repo, run `uv run --extra demo python -m app.space`, and open
+http://localhost:7860.
 
 ## Results
 
